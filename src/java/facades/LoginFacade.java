@@ -22,7 +22,7 @@ public class LoginFacade extends BaseFacade {
     
     public UserAccount login(String username, String password) {
         UserAccount account = userAccountFacade.findByUsername(username, em);
-        if (userAccountFacade.checkPassword(account, password)) {
+        if (account != null && userAccountFacade.checkPassword(account, password)) {
             sessionBean.setUser(account);
         }
         return account;
