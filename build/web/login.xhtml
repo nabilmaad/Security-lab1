@@ -20,10 +20,9 @@
                         <h:inputSecret id="passwd" value="#{loginBean.password}"/>
                     </h:panelGrid>
                     <h:commandButton value="Login" type="command"  actionListener="#{loginBean.login}">
-                        <f:ajax execute="id  passwd" render="status"/>
+                        <f:ajax execute="id passwd" render="status"/>
                     </h:commandButton>      
                     <div>
-                        <hr/>
                         <hr/>
                         <h:outputText style="color:royalblue; font-size: large;
                                       font-weight: bold" id="status" value="#{loginBean.status}"/>

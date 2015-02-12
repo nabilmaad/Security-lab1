@@ -36,6 +36,18 @@ public class UserAccountFacade extends BaseFacade {
         }
     }
     
+    public boolean persist(UserAccount user) {
+        try {
+            utx.begin();
+            
+            em.persist(user);
+            utx.commit();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
     public boolean setPassword(UserAccount userAccount, String password) {
         try {
             // randomly generate salt value

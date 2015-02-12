@@ -63,7 +63,7 @@ public class LoginBean extends BaseBean {
         if (user != null) {
             try {
                 ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                context.redirect(context.getRequestContextPath() + "/index.xhtml");
+                context.redirect(context.getRequestContextPath() + "/login_successful.xhtml");
             } catch (Exception e) {}
         } else {
             status = "Login failed. Invalid username or password.";

@@ -17,17 +17,24 @@
 
         <div id="top">
             <div style="float: left">
-                <h:link value="Home" outcome="/index" />
+                <c:if test="#{!sessionBean.loggedIn}" >
+                    <h:link value="Create Account" outcome="/create_account" />
+                </c:if>
+                <c:if test="#{sessionBean.loggedIn}" >
+                    <h:link value="Change Password" outcome="/change_password" />
+                </c:if>
                 <ui:insert name="top"></ui:insert>
             </div>
             
             <div style="float: right">
-                <c:if test="#{!sessionBean.loggedIn}" >
-                    <h:link value="Login" outcome="/login" />
-                </c:if>
-                <c:if test="#{sessionBean.loggedIn}" >
-                    <h:link value="View Account" outcome="/user/view_account" />
-                </c:if>
+                <h:form>
+                    <c:if test="#{!sessionBean.loggedIn}" >
+                        <h:link value="Login" outcome="/login" />
+                    </c:if>
+                    <c:if test="#{sessionBean.loggedIn}" >
+                        <h:commandLink value="Logout" action="#{loginBean.logout}" />
+                    </c:if>
+                </h:form>
             </div>
         </div>
 
@@ -38,14 +45,6 @@
         <div id="bottom">
             Nabil Maadarani - 6134578 |
             Franck Mamboue - 6175122
-            <c:if test="#{sessionBean.loggedIn}" >
-                <div style="float: right">
-                    <h:form>
-                        <h:commandButton value="Logout" type="command"  actionListener="#{loginBean.logout}">
-                        </h:commandButton>
-                    </h:form>
-                </div>
-            </c:if>
         </div>
 
     </h:body>

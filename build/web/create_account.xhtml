@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <body>
+
+        <ui:composition template="./template.xhtml">
+
+        <ui:define name="content">
+            <f:view>
+                <h:form>
+                    <h:panelGrid columns="3">
+                        
+                        <h:outputText value="Username" />
+                        <h:inputText id="user" value="#{createAccountBean.username}"
+                                     required="true" requiredMessage="Value is required."
+                                     validatorMessage="Please enter only letters and numbers in the username field.">
+                            <f:validateRegex pattern="^[a-zA-Z0-9]*$" />
+                        </h:inputText> 
+                        <h:message id="userMsg" style="color: red" for="user" />
+                        
+                        <h:outputText value="Password" />
+                        <h:inputSecret id="passwd" value="#{createAccountBean.password}"
+                                       required="true" requiredMessage="Value is required."/>
+                        <h:message id="passwdMsg" style="color: red" for="passwd" />
+                        
+                    </h:panelGrid>
+                    <h:commandButton value="Create Account" type="command"  actionListener="#{createAccountBean.createAccount}">
+                        <f:ajax execute="user passwd"
+                                render="userMsg passwdMsg"/>
+                    </h:commandButton>      
+                    <div>
+                        <hr/>
+                        <h:outputText style="color:royalblue; font-size: large;
+                                      font-weight: bold" id="status" value="#{createAccountBean.status}"/>
+                    </div>
+                </h:form>
+            </f:view>
+        </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

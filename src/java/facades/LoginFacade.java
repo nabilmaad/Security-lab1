@@ -24,8 +24,9 @@ public class LoginFacade extends BaseFacade {
         UserAccount account = userAccountFacade.findByUsername(username, em);
         if (account != null && userAccountFacade.checkPassword(account, password)) {
             sessionBean.setUser(account);
+            return account;
         }
-        return account;
+        return null;
     }
     
 }
