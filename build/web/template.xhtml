@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="./css/default.css"/>
+        <h:outputStylesheet name="./css/cssLayout.css"/>
+        <title>CSI4139 Lab 1</title>
+    </h:head>
+
+    <h:body>
+
+        <div id="top">
+            <div style="float: left">
+                <h:link value="Home" outcome="/index" />
+                <ui:insert name="top"></ui:insert>
+            </div>
+            
+            <div style="float: right">
+                <c:if test="#{!sessionBean.loggedIn}" >
+                    <h:link value="Login" outcome="/login" />
+                </c:if>
+                <c:if test="#{sessionBean.loggedIn}" >
+                    <h:link value="View Account" outcome="/user/view_account" />
+                </c:if>
+            </div>
+        </div>
+
+        <div id="content" class="center_content">
+            <ui:insert name="content"></ui:insert>
+        </div>
+
+        <div id="bottom">
+            Nabil Maadarani - 6134578 |
+            Franck Mamboue - 6175122
+            <c:if test="#{sessionBean.loggedIn}" >
+                <div style="float: right">
+                    <h:form>
+                        <h:commandButton value="Logout" type="command"  actionListener="#{loginBean.logout}">
+                        </h:commandButton>
+                    </h:form>
+                </div>
+            </c:if>
+        </div>
+
+    </h:body>
+
+</html>
