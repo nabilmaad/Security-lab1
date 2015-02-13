@@ -26,8 +26,8 @@ public class UserAccount {
     @Lob
     private HashMap<String, byte[]> oldPasswords; // set of passwords used by this account 
 
-    public String getOldPasswords() {
-        return username;
+    public HashMap<String, byte[]> getOldPasswords() {
+        return oldPasswords;
     }
 
     public void setOldPasswords(HashMap<String, byte[]> oldPasswords) {

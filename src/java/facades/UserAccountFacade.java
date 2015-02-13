@@ -24,14 +24,15 @@ public class UserAccountFacade extends BaseFacade {
             
             UserAccount account = new UserAccount();
             
-            UserAccount user;
             account.setUsername(username);
             setPassword(account, password);
+            
             
             em.persist(account);
             utx.commit();
             return true;
         } catch (Exception e) {
+            Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, e);
             return false;
         }
     }

@@ -5,6 +5,8 @@
  */
 package beans;
 
+import com.sun.xml.wss.impl.callback.PasswordValidationCallback;
+import com.sun.xml.wss.impl.callback.PasswordValidationCallback.PasswordValidationException;
 import facades.UserAccountFacade;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -26,6 +28,7 @@ public class CreateAccountBean extends BaseBean {
     
     private String username;
     private String password;
+    private String confirm;
     private String status;
 
     /**
@@ -69,6 +72,20 @@ public class CreateAccountBean extends BaseBean {
     public void setPassword(String password) {
         this.password = password;
     }
+    
+    /**
+     * @return the password confirmation
+     */
+    public String getConfirm() {
+        return confirm;
+    }
+
+    /**
+     * @param confirm the password confirmation to set
+     */
+    public void setConfirm(String confirm) {
+        this.confirm = confirm;
+    }
 
     /**
      * @return the status
@@ -84,7 +101,7 @@ public class CreateAccountBean extends BaseBean {
         this.status = status;
     }
     
-    public void createAccount() {
+    public void createAccount() throws PasswordValidationException {
         UserAccount checkDuplicate = userAccountFacade.findByUsername(username, em);
         if (checkDuplicate != null){
             status = "Username already exists in the database, please enter another username.";

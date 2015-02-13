@@ -28,13 +28,18 @@
                                        required="true" requiredMessage="Value is required.">
                                 <f:validator validatorId="passwordValidator" />
                         </h:inputSecret>
-                        
                         <h:message id="passwdMsg" style="color: red" for="passwd" />
-                        
+                                                
+                        <h:outputText value="Confirm Password" />
+                        <h:inputSecret id="confirm" value="#{createAccountBean.confirm}"
+                                       required="true" requiredMessage="Value is required.">
+                                <f:validator validatorId="passwordValidator" />
+                        </h:inputSecret>
+                        <h:message id="confirmMsg" style="color: red" for="confirm" />
                     </h:panelGrid>
                     <h:commandButton value="Create Account" type="command"  actionListener="#{createAccountBean.createAccount}">
-                        <f:ajax execute="user passwd"
-                                render="userMsg passwdMsg"/>
+                        <f:ajax execute="user passwd confirm"
+                                render="userMsg passwdMsg confirmMsg status"/>
                     </h:commandButton>      
                     <div>
                         <hr/>
