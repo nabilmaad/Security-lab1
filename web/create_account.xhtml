@@ -25,7 +25,10 @@
                         
                         <h:outputText value="Password" />
                         <h:inputSecret id="passwd" value="#{createAccountBean.password}"
-                                       required="true" requiredMessage="Value is required."/>
+                                       required="true" requiredMessage="Value is required.">
+                                <f:validator validatorId="passwordValidator" />
+                        </h:inputSecret>
+                        
                         <h:message id="passwdMsg" style="color: red" for="passwd" />
                         
                     </h:panelGrid>

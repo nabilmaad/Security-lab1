@@ -60,9 +60,11 @@ public class ChangePasswordBean extends BaseBean {
         
         if (user != null) {
             if(userAccountFacade.checkPassword(user, oldPassword)) {
-                userAccountFacade.setPassword(user, newPassword);
-                userAccountFacade.persist(user);
-                status = "Password successfully changed.";
+                if(userAccountFacade.updateUserPassword(user.getId(), newPassword)) {
+                    status = "Password successfully changed.";
+                } else {
+                    status = "An error occured while changing your password.";
+                }
             } else {
                 status = "The old password didn't match.";
             }

@@ -1,5 +1,6 @@
 package models;
 
+import java.util.HashMap;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -22,7 +23,17 @@ public class UserAccount {
     private byte[] password; // salted + hashed password
     @Lob
     private byte[] salt; // the salt used for this account
+    @Lob
+    private HashMap<String, byte[]> oldPasswords; // set of passwords used by this account 
 
+    public String getOldPasswords() {
+        return username;
+    }
+
+    public void setOldPasswords(HashMap<String, byte[]> oldPasswords) {
+        this.oldPasswords = oldPasswords;
+    }
+    
     public String getUsername() {
         return username;
     }

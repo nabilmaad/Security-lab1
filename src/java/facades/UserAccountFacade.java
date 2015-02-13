@@ -36,14 +36,20 @@ public class UserAccountFacade extends BaseFacade {
         }
     }
     
-    public boolean persist(UserAccount user) {
+    public boolean updateUserPassword(Long userId, String newPassword) {
         try {
             utx.begin();
+            String queryString = "SELECT ua FROM UserAccount ua WHERE ua.id = :id";
+            Query query = em.createQuery(queryString);
+            query.setParameter("id", userId);
+            UserAccount user = performQuery(UserAccount.class, query);
             
+            setPassword(user, newPassword);
             em.persist(user);
             utx.commit();
             return true;
         } catch (Exception e) {
+            Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, e);
             return false;
         }
     }
