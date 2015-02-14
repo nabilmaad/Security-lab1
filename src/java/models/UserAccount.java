@@ -1,5 +1,6 @@
 package models;
 
+import java.util.Date;
 import java.util.HashMap;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -24,7 +25,7 @@ public class UserAccount {
     @Lob
     private byte[] salt; // the salt used for this account
     @Lob
-    private HashMap<String, byte[]> oldPasswords; // set of passwords used by this account 
+    private HashMap<Date, byte[]> oldPasswords; // set of passwords used by this account 
     
     private int failedLoginAttempts = 0;
 
@@ -36,11 +37,15 @@ public class UserAccount {
         this.failedLoginAttempts = failedLoginAttempts;
     }
 
-    public HashMap<String, byte[]> getOldPasswords() {
+    public UserAccount() {
+        oldPasswords = new HashMap<>();
+    }
+    
+    public HashMap<Date, byte[]> getOldPasswords() {
         return oldPasswords;
     }
 
-    public void setOldPasswords(HashMap<String, byte[]> oldPasswords) {
+    public void setOldPasswords(HashMap<Date, byte[]> oldPasswords) {
         this.oldPasswords = oldPasswords;
     }
     

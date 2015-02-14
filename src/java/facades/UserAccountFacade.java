@@ -1,10 +1,13 @@
 package facades;
 
+import exeptions.PasswordAlreadyUsedException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,14 +40,36 @@ public class UserAccountFacade extends BaseFacade {
         }
     }
     
-    public boolean updateUserPassword(Long userId, String newPassword) {
+    public boolean updateUserPassword(Long userId, String newPassword) throws PasswordAlreadyUsedException {
         try {
             utx.begin();
             String queryString = "SELECT ua FROM UserAccount ua WHERE ua.id = :id";
             Query query = em.createQuery(queryString);
             query.setParameter("id", userId);
             UserAccount user = performQuery(UserAccount.class, query);
-            
+            // encrypt/salt newPassword
+            try {
+                byte[] salt = user.getSalt();
+                String saltString = new String(salt, "UTF-8");
+                String checkPass = saltString + newPassword;
+                MessageDigest digest = MessageDigest.getInstance("SHA-512");
+                byte[] checkPassHash = digest.digest(checkPass.getBytes("UTF-8"));
+                // check if it matches one of the old passwords
+                for (HashMap.Entry<Date, byte[]> entry : user.getOldPasswords().entrySet()) {
+                    Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, new String(entry.getValue(), "UTF-8"));
+                    Logger.getLogger(UserAccount.class.getName()).log(Level.INFO, new String(checkPassHash, "UTF-8"));
+                    Logger.getLogger(UserAccount.class.getName()).log(Level.INFO, "new space");
+                    Logger.getLogger(UserAccount.class.getName()).log(Level.INFO, "new space");
+
+                    if (Arrays.equals(checkPassHash, entry.getValue())) {
+                        Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, "ALREADY USED");
+                        throw new PasswordAlreadyUsedException("You already used this password."); 
+                    }
+                }
+            } catch (UnsupportedEncodingException | NoSuchAlgorithmException ex) {
+                Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            // replace old password with new password
             setPassword(user, newPassword);
             em.persist(user);
             utx.commit();
@@ -68,12 +93,14 @@ public class UserAccountFacade extends BaseFacade {
             byte[] passhash = digest.digest(saltedPass.getBytes("UTF-8"));
             userAccount.setSalt(salt);
             userAccount.setPassword(passhash);
+            // put current password in oldpassword Hash
+            userAccount.getOldPasswords().put(new Date(), userAccount.getPassword());
             return true;
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException | RuntimeException ex) {
             return false;
         }
     }
-    
+
     public boolean checkPassword(UserAccount userAccount, String password) {
         try {
             byte[] salt = userAccount.getSalt();
