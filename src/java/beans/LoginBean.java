@@ -76,6 +76,13 @@ public class LoginBean extends BaseBean {
             status = "Login failed. Invalid username or password.";
         }
     }
+
+    public void reset() {
+        try {
+            ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+            context.redirect(context.getRequestContextPath() + "/reset_password.xhtml");
+        } catch (Exception e) {}
+    }
     
     public void logout() {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
