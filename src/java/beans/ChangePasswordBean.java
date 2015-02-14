@@ -17,6 +17,7 @@ public class ChangePasswordBean extends BaseBean {
 
     private String oldPassword;
     private String newPassword;
+    private boolean disableChangeButton;
     private String status;
     
     /**
@@ -48,6 +49,14 @@ public class ChangePasswordBean extends BaseBean {
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
     }
+    
+    public boolean getDisableChangeButton() {
+        return disableChangeButton;
+    }
+
+    public void setDisableChangeButton(boolean disableChangeButton) {
+        this.disableChangeButton = disableChangeButton;
+    }
 
     public String getStatus() {
         return status;
@@ -72,6 +81,7 @@ public class ChangePasswordBean extends BaseBean {
                 }
                 if(!passwordPreviouslyUsed && passwordChanged) {
                     status = "Password successfully changed. Your new password will be active as soon as you logout.";
+                    disableChangeButton = true;
                 } else if (!passwordChanged) {
                     status = "An error occured while changing your password.";
                 }

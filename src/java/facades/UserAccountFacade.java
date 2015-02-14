@@ -94,7 +94,7 @@ public class UserAccountFacade extends BaseFacade {
             userAccount.setSalt(salt);
             userAccount.setPassword(passhash);
             // put current password in oldpassword Hash
-            userAccount.getOldPasswords().put(new Date(), userAccount.getPassword());
+            userAccount.getOldPasswords().put(new Date(), passhash);
             return true;
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException | RuntimeException ex) {
             return false;
