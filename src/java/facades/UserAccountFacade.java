@@ -82,12 +82,57 @@ public class UserAccountFacade extends BaseFacade {
             MessageDigest digest = MessageDigest.getInstance("SHA-512");
             byte[] checkPassHash = digest.digest(checkPass.getBytes("UTF-8"));
             if (Arrays.equals(checkPassHash, userAccount.getPassword())) {
-                return true; 
+                // Reset failed password attempts to zero if not locked out
+                if(userAccount.getFailedLoginAttempts() < 10) {
+                    userAccount.setFailedLoginAttempts(0);
+                    resetFailedAttempts(userAccount.getId());
+                    return true;
+                }
+            } else {
+                // Increment failed login attempts
+                userAccount.setFailedLoginAttempts(incrementFailedAttempts(userAccount.getId()));
             }
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException ex) {
             Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
+    }
+    
+    public boolean resetFailedAttempts(Long userId)
+    {
+        try {
+            utx.begin();
+            String queryString = "SELECT ua FROM UserAccount ua WHERE ua.id = :id";
+            Query query = em.createQuery(queryString);
+            query.setParameter("id", userId);
+            UserAccount user = performQuery(UserAccount.class, query);
+            
+            user.setFailedLoginAttempts(0);
+            em.persist(user);
+            utx.commit();
+            return true;
+        } catch (Exception e) {
+            Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, e);
+            return false;
+        }
+    }
+    
+    public int incrementFailedAttempts(Long userId){
+        try {
+            utx.begin();
+            String queryString = "SELECT ua FROM UserAccount ua WHERE ua.id = :id";
+            Query query = em.createQuery(queryString);
+            query.setParameter("id", userId);
+            UserAccount user = performQuery(UserAccount.class, query);
+            
+            user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
+            em.persist(user);
+            utx.commit();
+            return user.getFailedLoginAttempts();
+        } catch (Exception e) {
+            Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, e);
+            return 0;
+        }
     }
     
     public UserAccount findByUsername(String username, EntityManager em) {

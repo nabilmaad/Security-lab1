@@ -25,6 +25,16 @@ public class UserAccount {
     private byte[] salt; // the salt used for this account
     @Lob
     private HashMap<String, byte[]> oldPasswords; // set of passwords used by this account 
+    
+    private int failedLoginAttempts = 0;
+
+    public int getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+
+    public void setFailedLoginAttempts(int failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
 
     public HashMap<String, byte[]> getOldPasswords() {
         return oldPasswords;

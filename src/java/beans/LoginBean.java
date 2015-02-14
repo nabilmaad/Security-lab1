@@ -61,10 +61,17 @@ public class LoginBean extends BaseBean {
         UserAccount user = loginFacade.login(username, password);
         
         if (user != null) {
-            try {
-                ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                context.redirect(context.getRequestContextPath() + "/login_successful.xhtml");
-            } catch (Exception e) {}
+            if(user.getFailedLoginAttempts() >= 10)
+                status = "This account has been locked out because the limit for failed login "
+                        + "attempts has been reached.\n"
+                        + "For assistance, please call (xxx)xxx-xxxx or send an email to "
+                        + "some@email.com";
+            else {
+                try {
+                    ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+                    context.redirect(context.getRequestContextPath() + "/login_successful.xhtml");
+                } catch (Exception e) {}
+            }
         } else {
             status = "Login failed. Invalid username or password.";
         }

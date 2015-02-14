@@ -21,9 +21,9 @@
                     </h:panelGrid>
                     <h:commandButton value="Login" type="command"  actionListener="#{loginBean.login}">
                         <f:ajax execute="id passwd" render="status"/>
-                    </h:commandButton>      
+                    </h:commandButton> 
+                    <hr/>
                     <div>
-                        <hr/>
                         <h:outputText style="color:royalblue; font-size: large;
                                       font-weight: bold" id="status" value="#{loginBean.status}"/>
                     </div>

@@ -22,9 +22,15 @@ public class LoginFacade extends BaseFacade {
     
     public UserAccount login(String username, String password) {
         UserAccount account = userAccountFacade.findByUsername(username, em);
-        if (account != null && userAccountFacade.checkPassword(account, password)) {
-            sessionBean.setUser(account);
-            return account;
+        
+        if (account != null) {
+            if(userAccountFacade.checkPassword(account, password)) {
+                sessionBean.setUser(account);
+                return account;
+            } else if(account.getFailedLoginAttempts() >= 10) {
+                // Lock out user account if wrong password is entered 10 times
+                return account;
+            }
         }
         return null;
     }
