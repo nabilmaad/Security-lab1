@@ -5,7 +5,6 @@
  */
 package beans;
 
-import com.sun.xml.wss.impl.callback.PasswordValidationCallback;
 import com.sun.xml.wss.impl.callback.PasswordValidationCallback.PasswordValidationException;
 import facades.UserAccountFacade;
 import javax.faces.bean.ManagedBean;

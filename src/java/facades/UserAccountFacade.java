@@ -6,7 +6,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Level;
@@ -15,6 +14,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
 import models.UserAccount;
 
 @ManagedBean
@@ -47,34 +51,30 @@ public class UserAccountFacade extends BaseFacade {
             Query query = em.createQuery(queryString);
             query.setParameter("id", userId);
             UserAccount user = performQuery(UserAccount.class, query);
-            // encrypt/salt newPassword
             try {
-                byte[] salt = user.getSalt();
-                String saltString = new String(salt, "UTF-8");
-                String checkPass = saltString + newPassword;
-                MessageDigest digest = MessageDigest.getInstance("SHA-512");
-                byte[] checkPassHash = digest.digest(checkPass.getBytes("UTF-8"));
-                // check if it matches one of the old passwords
-                for (HashMap.Entry<Date, byte[]> entry : user.getOldPasswords().entrySet()) {
-                    Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, new String(entry.getValue(), "UTF-8"));
-                    Logger.getLogger(UserAccount.class.getName()).log(Level.INFO, new String(checkPassHash, "UTF-8"));
-                    Logger.getLogger(UserAccount.class.getName()).log(Level.INFO, "new space");
-                    Logger.getLogger(UserAccount.class.getName()).log(Level.INFO, "new space");
+                // check if new password matches one of the old passwords
+                for (HashMap.Entry<byte[], byte[]> entry : user.getOldPasswords().entrySet()) {
+                    // encrypt clear text newPassword with salt of the current oldPassword hash
+                    byte[] salt = entry.getKey();
+                    String saltString = new String(salt, "UTF-8");
+                    String checkPass = saltString + newPassword;
+                    MessageDigest digest = MessageDigest.getInstance("SHA-512");
+                    byte[] checkPassHash = digest.digest(checkPass.getBytes("UTF-8"));
 
                     if (Arrays.equals(checkPassHash, entry.getValue())) {
-                        Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, "ALREADY USED");
-                        throw new PasswordAlreadyUsedException("You already used this password."); 
+                        throw new PasswordAlreadyUsedException("You already used this password.");
                     }
                 }
             } catch (UnsupportedEncodingException | NoSuchAlgorithmException ex) {
                 Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
             }
             // replace old password with new password
             setPassword(user, newPassword);
             em.persist(user);
             utx.commit();
             return true;
-        } catch (Exception e) {
+        } catch (NotSupportedException | SystemException | RollbackException | HeuristicMixedException | HeuristicRollbackException | SecurityException | IllegalStateException e) {
             Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, e);
             return false;
         }
@@ -94,7 +94,7 @@ public class UserAccountFacade extends BaseFacade {
             userAccount.setSalt(salt);
             userAccount.setPassword(passhash);
             // put current password in oldpassword Hash
-            userAccount.getOldPasswords().put(new Date(), passhash);
+            userAccount.getOldPasswords().put(salt, passhash);
             return true;
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException | RuntimeException ex) {
             return false;

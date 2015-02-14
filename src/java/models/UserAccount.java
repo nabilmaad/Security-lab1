@@ -25,7 +25,7 @@ public class UserAccount {
     @Lob
     private byte[] salt; // the salt used for this account
     @Lob
-    private HashMap<Date, byte[]> oldPasswords; // set of passwords used by this account 
+    private HashMap<byte[], byte[]> oldPasswords; // set of passwords used by this account 
     
     private int failedLoginAttempts = 0;
 
@@ -41,11 +41,11 @@ public class UserAccount {
         oldPasswords = new HashMap<>();
     }
     
-    public HashMap<Date, byte[]> getOldPasswords() {
+    public HashMap<byte[], byte[]> getOldPasswords() {
         return oldPasswords;
     }
 
-    public void setOldPasswords(HashMap<Date, byte[]> oldPasswords) {
+    public void setOldPasswords(HashMap<byte[], byte[]> oldPasswords) {
         this.oldPasswords = oldPasswords;
     }
     

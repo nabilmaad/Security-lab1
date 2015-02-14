@@ -2,7 +2,6 @@ package beans;
 
 import exeptions.PasswordAlreadyUsedException;
 import facades.UserAccountFacade;
-import java.util.Date;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
@@ -77,13 +76,15 @@ public class ChangePasswordBean extends BaseBean {
                     passwordChanged = userAccountFacade.updateUserPassword(user.getId(), newPassword);
                 } catch (PasswordAlreadyUsedException e) {
                     passwordPreviouslyUsed = true;
-                    status = e.toString();
+                    status = "You already used this password before.";
                 }
-                if(!passwordPreviouslyUsed && passwordChanged) {
+                if(!passwordPreviouslyUsed) {
+                    if (passwordChanged) {
                     status = "Password successfully changed. Your new password will be active as soon as you logout.";
                     disableChangeButton = true;
-                } else if (!passwordChanged) {
-                    status = "An error occured while changing your password.";
+                    } else {
+                    status = "An error occured while changing your password. Please try again.";
+                    }
                 }
             } else {
                 status = "The old password didn't match.";

@@ -2,7 +2,6 @@ package beans;
 
 import exeptions.PasswordAlreadyUsedException;
 import facades.UserAccountFacade;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
