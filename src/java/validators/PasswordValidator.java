@@ -5,16 +5,15 @@
  */
 package validators;
 
-import beans.CreateAccountBean;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -22,14 +21,24 @@ import javax.faces.validator.ValidatorException;
  */
 @FacesValidator("passwordValidator")
 public class PasswordValidator implements Validator {
+    
+    private Pattern pattern;
+    private Matcher matcher;
+    
+    private static final String PASSWORD_PATTERN = 
+              "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{6,20})";
+ 
+    public PasswordValidator(){
+            pattern = Pattern.compile(PASSWORD_PATTERN);
+    }
 
     @Override
     public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
         try {
             String password = (String)value;
             
-            if (password.length() < 6) {
-                FacesMessage message = new FacesMessage("Your password must contain at least 6 characters.");
+            if (!validate(password)) {
+                FacesMessage message = new FacesMessage("Your password must contain 6 to 20 characters with at least one digit, one upper case letter, one lower case letter and one special symbol (“@#$%”)..");
                 throw new ValidatorException(message);
             }
             
@@ -56,6 +65,18 @@ public class PasswordValidator implements Validator {
             FacesMessage message = new FacesMessage("Value must be a a String.");
             throw new ValidatorException(message);
         }
+    }
+    
+    /**
+     * Validate password with regular expression
+     * @param password password for validation
+     * @return true valid password, false invalid password
+     */
+    public boolean validate(final String password){
+
+            matcher = pattern.matcher(password);
+            return matcher.matches();
+
     }
     
 }
