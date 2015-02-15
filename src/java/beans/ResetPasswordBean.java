@@ -72,6 +72,9 @@ public class ResetPasswordBean extends BaseBean {
                 boolean passwordChanged = true;
                 try {
                     passwordChanged = userAccountFacade.updateUserPassword(user.getId(), newPassword);
+                    // Reset failed password attempts
+                    userAccountFacade.resetFailedAttempts(user.getId());
+                    user.setFailedLoginAttempts(0);
                 } catch (PasswordAlreadyUsedException e) {
                     setStatus("An error occured. Please try again.");
                 }

@@ -38,7 +38,7 @@ public class PasswordValidator implements Validator {
             String password = (String)value;
             
             if (!validate(password)) {
-                FacesMessage message = new FacesMessage("Your password must contain 6 to 20 characters with at least one digit, one upper case letter, one lower case letter and one special symbol (“@#$%”)..");
+                FacesMessage message = new FacesMessage("Your password must contain 6 to 20 characters with at least one digit, one upper case letter, one lower case letter and one of the following characters: @#$%");
                 throw new ValidatorException(message);
             }
             

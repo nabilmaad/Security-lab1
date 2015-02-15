@@ -9,7 +9,7 @@ import java.util.Random;
 
 public final class RandomPasswordGenerator {
 private static final String CHAR_LIST =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%";
     private static final int RANDOM_STRING_LENGTH = 10;
      
     /**

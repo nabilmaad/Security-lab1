@@ -63,9 +63,7 @@ public class LoginBean extends BaseBean {
         if (user != null) {
             if(user.getFailedLoginAttempts() >= 10)
                 status = "This account has been locked out because the limit for failed login "
-                        + "attempts has been reached.\n"
-                        + "For assistance, please call (xxx)xxx-xxxx or send an email to "
-                        + "some@email.com";
+                        + "attempts has been reached. Please reset your password.";
             else {
                 try {
                     ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
