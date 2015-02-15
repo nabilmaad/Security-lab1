@@ -16,6 +16,7 @@ public class ChangePasswordBean extends BaseBean {
 
     private String oldPassword;
     private String newPassword;
+    private String confirm;
     private boolean disableChangeButton;
     private String status;
     
@@ -47,6 +48,14 @@ public class ChangePasswordBean extends BaseBean {
 
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
+    }
+    
+    public String getConfirm() {
+        return confirm;
+    }
+
+    public void setConfirm(String confirm) {
+        this.confirm = confirm;
     }
     
     public boolean getDisableChangeButton() {
