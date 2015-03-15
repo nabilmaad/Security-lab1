@@ -16,7 +16,7 @@
     <h:body>
 
         <div id="top">
-            <div style="float: left">
+            <div style="float: left; width: 50%">
                 <c:if test="#{!sessionBean.loggedIn}" >
                     <h:link value="Create Account" outcome="/create_account" />
                 </c:if>
@@ -24,6 +24,12 @@
                     <h:link value="Change Password" outcome="/change_password" />
                 </c:if>
                 <ui:insert name="top"></ui:insert>
+            </div>
+            
+            <div style="float: left">
+                <c:if test="#{sessionBean.loggedIn}" >
+                    <h:link value="Home" outcome="/login_successful" />
+                </c:if>
             </div>
             
             <div style="float: right">
@@ -43,7 +49,6 @@
         </div>
 
         <div id="bottom">
-            Nabil Maadarani - 6134578 |
             Franck Mamboue - 6175122
         </div>
 

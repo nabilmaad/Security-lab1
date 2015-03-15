@@ -2,6 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:h="http://xmlns.jcp.org/jsf/html">
 
     <body>
@@ -9,9 +10,25 @@
         <ui:composition template="./template.xhtml">
 
         <ui:define name="content">
-            You are logged in...
+            <h1>My profile</h1>
+            <ul>
+                <h:form enctype="multipart/form-data">
+                <li>
+                    <h:outputLabel>Upload your public key: </h:outputLabel>
+                    <h:inputFile id="publicKey" value="#{uploadBean.publicKey}" validator="#{uploadBean.validatePublicKey}"/>
+                    <h:commandButton value="Upload" action="#{uploadBean.upload}">
+                        <f:ajax execute="publicKey" render="status"/>
+                    </h:commandButton>
+                </li>
+                </h:form>
+                <li><h:link value="Browse public keys" outcome="/browse_public_keys" /></li>
+            </ul>
+            <hr/>
+            <div>
+                <h:outputText style="color:royalblue; font-size: large; font-weight: bold" id="status" value="#{uploadBean.status}"/>
+            </div>
         </ui:define>
-
+            
         </ui:composition>
 
     </body>
