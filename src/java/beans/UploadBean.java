@@ -10,6 +10,10 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 import models.UserAccount;
 
+/**
+ *
+ * @author Franck Mamboue
+ */
 @ManagedBean
 @ViewScoped
 public class UploadBean extends BaseBean {
@@ -18,7 +22,7 @@ public class UploadBean extends BaseBean {
     UserAccountFacade userAccountFacade;
 
     private Part publicKey;
-
+    private UserAccount user;
     private String status;
     
     public UserAccountFacade getUserAccountFacade() {
@@ -27,6 +31,14 @@ public class UploadBean extends BaseBean {
 
     public void setUserAccountFacade(UserAccountFacade userAccountFacade) {
         this.userAccountFacade = userAccountFacade;
+    }
+
+    public UserAccount getUser() {
+        return sessionBean.getUser();
+    }
+
+    public void setUser(UserAccount user) {
+        this.user = user;
     }
     
     public String getStatus() {
@@ -41,10 +53,8 @@ public class UploadBean extends BaseBean {
         this.publicKey = publicKey;
     }
     
-    public void upload() {
-        UserAccount user = sessionBean.getUser();
-        
-        if (user != null) {
+    public void upload() {        
+        if (getUser() != null) {
             try {
               String fileContent = new Scanner(publicKey.getInputStream()).useDelimiter("\\A").next();
               userAccountFacade.setPublicKey(user.getId(), fileContent);
@@ -58,12 +68,10 @@ public class UploadBean extends BaseBean {
     }
     
     public void validatePublicKey(FacesContext ctx, UIComponent comp, Object value) {
-        UserAccount user = sessionBean.getUser();
-
-        if (user != null) {
+        if (getUser() != null) {
             Part file = (Part)value;
             if (file != null) {
-                    status = "";
+                status = "";
                 if (file.getSize() > 1024) {
                   status += "- File too big.\n";
                 }
@@ -75,14 +83,5 @@ public class UploadBean extends BaseBean {
             status = "You are not logged in.";
         }    
     }
-        
-    public void browseAll() {
-        UserAccount user = sessionBean.getUser();
-        
-        if (user != null) {
-            status = "All";
-        } else {
-            status = "You are not logged in.";
-        }
-    }
+
 }

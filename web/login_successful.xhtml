@@ -10,19 +10,22 @@
         <ui:composition template="./template.xhtml">
 
         <ui:define name="content">
-            <h1>My profile</h1>
-            <ul>
-                <h:form enctype="multipart/form-data">
-                <li>
-                    <h:outputLabel>Upload your public key: </h:outputLabel>
-                    <h:inputFile id="publicKey" value="#{uploadBean.publicKey}" validator="#{uploadBean.validatePublicKey}"/>
+            <h1><h:outputText value="#{uploadBean.user.username}"/></h1>
+            <h:form enctype="multipart/form-data">
+                <ul>
+                    <li><h:outputLabel>Upload your public key: </h:outputLabel></li>
+                    
+                    <h:inputFile id="publicKey" value="#{uploadBean.publicKey}" validator="#{uploadBean.validatePublicKey}"/><br/>
                     <h:commandButton value="Upload" action="#{uploadBean.upload}">
                         <f:ajax execute="publicKey" render="status"/>
                     </h:commandButton>
-                </li>
-                </h:form>
-                <li><h:link value="Browse public keys" outcome="/browse_public_keys" /></li>
-            </ul>
+                    
+                    <li><h:link value="Browse public keys" outcome="/browse_public_keys" /></li>
+                    <li><h:link value="Send a secure file" outcome="/send_file" /></li>
+                    <li><h:link value="Decrypt a secure file" outcome="/decrypt_file" /></li>
+                </ul>
+            </h:form>
+
             <hr/>
             <div>
                 <h:outputText style="color:royalblue; font-size: large; font-weight: bold" id="status" value="#{uploadBean.status}"/>
