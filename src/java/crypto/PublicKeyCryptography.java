@@ -5,12 +5,8 @@
  */
 package crypto;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.*;
 import java.security.spec.InvalidKeySpecException;
@@ -35,6 +31,9 @@ import sun.misc.BASE64Encoder;
  * 7. Decrypt the data using the Symmetric Key
  * 8. Create a hash of the data decrypted
  * 9. Verify the signature using the Senders public Key
+ * 
+ * This program assumes that public/private key pairs were generated for Alice (sender) and Bob (receiver). 
+ * See https://www.owasp.org/index.php/Digital_Signature_Implementation_in_Java
  * 
  */
 
@@ -65,7 +64,7 @@ public class PublicKeyCryptography {
         public static boolean sendFile(UserAccount user, String recipient, String fileContent, PrivateKey senderPrivateKey, PublicKey receiverPublicKey) {
             SENDER = user;
             RECEIVER_EMAIL = recipient;
-            if (user == null || recipient == null|| fileContent == null || senderPrivateKey == null || receiverPublicKey == null)
+            if (user == null || recipient == null || fileContent == null || senderPrivateKey == null || receiverPublicKey == null)
                 return false;
             return sendFile(fileContent, senderPrivateKey, receiverPublicKey);
         }
@@ -105,7 +104,7 @@ public class PublicKeyCryptography {
                 
                 // 5. Send the the encrypted file, the encrypted symmetric key and the signed hash to the receiver
                 FileOutputStream encryptedFileOS, encryptedSymmetricKeyOS, signedHashOS;
-                String[] filenames = new String[]{"encrypted-file", "encrypted-symmetric-key", "signed-hash"};
+                String[] filenames = new String[]{"encrypted-file.txt", "encrypted-symmetric-key.txt", "signed-hash.txt"};
                 try {
                     encryptedFileOS = new FileOutputStream(filenames[0]);
                     encryptedFileOS.write(encryptedFile);
@@ -120,12 +119,6 @@ public class PublicKeyCryptography {
                     Logger.getLogger(PublicKeyCryptography.class.getName()).log(Level.SEVERE, null, ex);
                     return false;
                 }
-                
-                // @todo: remove
-                BASE64Encoder encoder = new BASE64Encoder();
-                System.out.println("Encrypted file: "+encoder.encode(encryptedFile));
-                System.out.println("Encrypted key: "+encoder.encode(encryptedSymmetricKey));
-                System.out.println("Signed hash: "+encoder.encode(signedHash));
 
                 if (MailHelper.sendEmail(SENDER, RECEIVER_EMAIL, "CSI439 secure file", "Please find attached a secure file sent by " + SENDER.getUsername(), filenames))
                     return true;
@@ -137,58 +130,35 @@ public class PublicKeyCryptography {
         } 
 
 	/**
-         * Use the main function to call the decryptFile or to print the public/private key pairs generated inside of the keystore.
+         * Prints the public keys for Alice and Bob
 	 * @param args
 	 */
     public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, KeyStoreException, CertificateException, UnrecoverableKeyException {
-        
-        // This code helps decrypting the file received
-        // Assuming that the receiver downloaded the email attachment in the local home directory
-        Path path1 = Paths.get(System.getProperty("user.home")+"/encrypted-file");
-        encryptedFile = Files.readAllBytes(path1);
-        Path path2 = Paths.get(System.getProperty("user.home")+"/encrypted-symmetric-key");
-        encryptedSymmetricKey = Files.readAllBytes(path2);
-        Path path3 = Paths.get(System.getProperty("user.home")+"/signed-hash");
-        signedHash = Files.readAllBytes(path3);        
-        decryptFile(encryptedFile, encryptedSymmetricKey, signedHash);
-        
-        
-        /************************************************************************************************/
-        
-        /*
-        // This code helps printing the sender's private key and the receiver's public key
         // Getting keystore
-        ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        KEYSTORE = KeyStore.getInstance(KeyStore.getDefaultType());
 	char [] password = KEYSTORE_PASSWORD.toCharArray();
 	java.io.FileInputStream fis = new java.io.FileInputStream(KEYSTORE_LOCATION); // Assuming the keystore file is located in the home directory
-        ks.load(fis, password);
+        KEYSTORE.load(fis, password);
         fis.close();
 
-        String publicKeyAlias = RECEIVER_ALIAS; // Update with the alias of the user who's public key you want to see
-        String privateKeyAlias = SENDER_ALIAS; // Update with the alias of the user who's private key you want to see
-        String privateKeyPassword = SENDER_PASSWORD; // Update with the password of the user who's private key you want to see
-
         // Creating an X509 Certificate
-        X509Certificate cert;
-        cert = (X509Certificate)ks.getCertificate(publicKeyAlias);
-        
-        // Getting public Key from the Certificate
-        PublicKey pubKeyReceiver = cert.getPublicKey();
-        
-        // Getting private key from the Certificate
-        char[] keypassword = privateKeyPassword.toCharArray(); 
-        Key myKey =  ks.getKey(privateKeyAlias, keypassword);
-        PrivateKey myPrivateKey = (PrivateKey)myKey;
+        X509Certificate certSender, certReceiver;
+        certSender = (X509Certificate)KEYSTORE.getCertificate(SENDER_ALIAS);
+        certReceiver = (X509Certificate)KEYSTORE.getCertificate(RECEIVER_ALIAS);
 
+        // Getting public Key from the Certificate
+        PublicKey pubKeySender = certSender.getPublicKey();
+        PublicKey pubKeyReceiver = certReceiver.getPublicKey();
+        
         // Print them
         BASE64Encoder encoder = new BASE64Encoder();
-        System.out.println("Public key: "+encoder.encode(pubKeyReceiver.getEncoded()));
-        System.out.println("Sender private key: "+encoder.encode(myPrivateKey.getEncoded()));
-        */
+        System.out.println("Alice's Public Key (Sender): \n\n"+encoder.encode(pubKeySender.getEncoded())+"\n");
+        System.out.println("Bob's Public Key (Receiver): \n\n"+encoder.encode(pubKeyReceiver.getEncoded())+"\n");
     
     }
         
-    public static boolean decryptFile(byte[] encryptedFile, byte[] encryptedSymmetricKey, byte[] signedHash) throws FileNotFoundException, IOException, CertificateException {
+    public static String decryptFile(byte[] encryptedFile, byte[] encryptedSymmetricKey, byte[] signedHash) {
+    String status = "";
     try {
         KEYSTORE = KeyStore.getInstance(KeyStore.getDefaultType());
 
@@ -211,7 +181,7 @@ public class PublicKeyCryptography {
         javax.crypto.spec.SecretKeySpec secretKeySpecDecrypted = new javax.crypto.spec.SecretKeySpec(byteDecryptWithPrivateKey,ENCRYPTION_STANDARD);
         byte[] byteDecryptText = encryptUtil.decryptData(encryptedFile,secretKeySpecDecrypted,ENCRYPTION_STANDARD);
         String strDecryptedText = new String(byteDecryptText);
-        System.out.println(" Decrypted data is: " +strDecryptedText);
+        status +="- Decrypted data is: \n\n" +strDecryptedText+ "\n";
 
         // 8. Create a hash of the data that was decrypted
         MessageDigest md = MessageDigest.getInstance(ALGORITHM);
@@ -237,15 +207,15 @@ public class PublicKeyCryptography {
 
         boolean verifySign = myVerifySign.verify(signedHash);
         if (verifySign == false) {
-            System.out.println(" Error in validating Signature ");
+            status += "- Signature is not validated.";
         } else {
-            System.out.println(" Successfully validated Signature ");
+            status+= "- Successfully validated Signature :)";
         }
-	return true;
-	} catch(KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | InvalidKeyException | SignatureException e) {
+	} catch(KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException | InvalidKeyException | SignatureException e) {
             Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, e);
-            return false;
+            status += "- Error while decrypting file: " + e.getMessage();
         }
+        return status;
     }
 
 }
