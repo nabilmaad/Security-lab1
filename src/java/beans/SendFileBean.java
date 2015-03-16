@@ -130,13 +130,13 @@ public class SendFileBean extends BaseBean {
                         if (receiverPublicKey != null && !"".equals(receiverPublicKey)) {
                             // Open the keystore
                             KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-                            char [] password = "testpwd".toCharArray();
-                            try (java.io.FileInputStream fis = new java.io.FileInputStream(System.getProperty("user.dir")+"/testkeystore.ks")) {
+                            char [] password = PublicKeyCryptography.KEYSTORE_PASSWORD.toCharArray();
+                            try (java.io.FileInputStream fis = new java.io.FileInputStream(PublicKeyCryptography.KEYSTORE_LOCATION)) {
                                 ks.load(fis, password);
                             }
                             // Get local user's private key
-                            char[] keypassword = "send123".toCharArray();
-                            Key myKey =  ks.getKey("testsender", keypassword);
+                            char[] keypassword = PublicKeyCryptography.SENDER_PASSWORD.toCharArray();
+                            Key myKey =  ks.getKey(PublicKeyCryptography.SENDER_ALIAS, keypassword);
                             PrivateKey myPrivateKey = (PrivateKey)myKey;
 
                             // Parse the public key entered by the user in the interface

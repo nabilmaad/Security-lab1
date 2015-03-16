@@ -23,7 +23,7 @@
                         <h:message id="userMsg" style="color: red" for="receiverEmail" />
                         <h:outputText value="Receiver's public key:" />
                         <h:inputTextarea id="receiverPublicKey" value="#{sendFileBean.receiverPublicKey}"/>
-                        <h:link value="Browse public keys" outcome="/browse_public_keys" target="_blank"/>
+                        <h:link value="Browse Public Keys" outcome="/browse_public_keys" target="_blank"/>
                     </h:panelGrid>
                     <h:commandButton value="Send" type="command"  actionListener="#{sendFileBean.send}">
                         <f:ajax execute="file receiverEmail receiverPublicKey"

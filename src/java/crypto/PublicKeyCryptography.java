@@ -41,9 +41,21 @@ import sun.misc.BASE64Encoder;
 public class PublicKeyCryptography {
     
         private static final SymmetricEncrypt encryptUtil = new SymmetricEncrypt();
-        private static KeyStore ks;
-        private static UserAccount sender;
-        private static String receiver;
+        private static KeyStore KEYSTORE;
+        private static UserAccount SENDER;
+        private static String RECEIVER_EMAIL;
+        
+        // Crypto variables
+        public static String ALGORITHM = "SHA-512";
+        public static String ENCRYPTION_STANDARD = "AES";
+                
+        // KeyStore variables
+        public static String KEYSTORE_LOCATION = System.getProperty("user.home")+"/keystore.ks";
+        public static String KEYSTORE_PASSWORD = "testpwd";
+        public static String SENDER_ALIAS = "alice";
+        public static String SENDER_PASSWORD = "send123";
+        public static String RECEIVER_ALIAS = "bob";
+        public static String RECEIVER_PASSWORD = "rcv123";
         
         // decryptFile method input
         private static byte[] encryptedFile;
@@ -51,8 +63,8 @@ public class PublicKeyCryptography {
         private static byte[] signedHash;
         
         public static boolean sendFile(UserAccount user, String recipient, String fileContent, PrivateKey senderPrivateKey, PublicKey receiverPublicKey) {
-            sender = user;
-            receiver = recipient;
+            SENDER = user;
+            RECEIVER_EMAIL = recipient;
             if (user == null || recipient == null|| fileContent == null || senderPrivateKey == null || receiverPublicKey == null)
                 return false;
             return sendFile(fileContent, senderPrivateKey, receiverPublicKey);
@@ -66,14 +78,14 @@ public class PublicKeyCryptography {
             SecretKey senderSecretKey = SymmetricEncrypt.getSecret();
 
             // 1. Encrypt the file data using the Symmetric Key
-            encryptedFile = encryptUtil.encryptData(fileBytes,senderSecretKey,"AES");
+            encryptedFile = encryptUtil.encryptData(fileBytes,senderSecretKey,ENCRYPTION_STANDARD);
 
             // 2. Encrypt the Symmetric key using the Receivers public key
             try {
                 encryptedSymmetricKey = encryptUtil.encryptData(senderSecretKey.getEncoded(),receiverPublicKey,"RSA/ECB/OAEPWithSHA1AndMGF1Padding");
 
                 // 3. Create a hash of the data to be transmitted
-                MessageDigest md = MessageDigest.getInstance("SHA-512");
+                MessageDigest md = MessageDigest.getInstance(ALGORITHM);
                 md.update(fileBytes);
                 byte byteMDofDataToTransmit[] = md.digest();
 
@@ -115,7 +127,7 @@ public class PublicKeyCryptography {
                 System.out.println("Encrypted key: "+encoder.encode(encryptedSymmetricKey));
                 System.out.println("Signed hash: "+encoder.encode(signedHash));
 
-                if (MailHelper.sendEmail(sender, receiver, "CSI439 secure file", "Please find attached a secure file sent by " + sender.getUsername(), filenames))
+                if (MailHelper.sendEmail(SENDER, RECEIVER_EMAIL, "CSI439 secure file", "Please find attached a secure file sent by " + SENDER.getUsername(), filenames))
                     return true;
                 
             } catch(NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
@@ -129,6 +141,8 @@ public class PublicKeyCryptography {
 	 * @param args
 	 */
     public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, KeyStoreException, CertificateException, UnrecoverableKeyException {
+        
+        // This code helps decrypting the file received
         // Assuming that the receiver downloaded the email attachment in the local home directory
         Path path1 = Paths.get(System.getProperty("user.home")+"/encrypted-file");
         encryptedFile = Files.readAllBytes(path1);
@@ -138,62 +152,69 @@ public class PublicKeyCryptography {
         signedHash = Files.readAllBytes(path3);        
         decryptFile(encryptedFile, encryptedSymmetricKey, signedHash);
         
-      // This code helps printing the sender's private key and the receiver's public key
         
-    /*
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-	char [] password = "testpwd".toCharArray();
-	java.io.FileInputStream fis = new java.io.FileInputStream(System.getProperty("user.home")+"/testkeystore.ks");
+        /************************************************************************************************/
+        
+        /*
+        // This code helps printing the sender's private key and the receiver's public key
+        // Getting keystore
+        ks = KeyStore.getInstance(KeyStore.getDefaultType());
+	char [] password = KEYSTORE_PASSWORD.toCharArray();
+	java.io.FileInputStream fis = new java.io.FileInputStream(KEYSTORE_LOCATION); // Assuming the keystore file is located in the home directory
         ks.load(fis, password);
         fis.close();
 
-        // Creating an X509 Certificate of the Receiver
-        X509Certificate recvcert ;
-        MessageDigest md = MessageDigest.getInstance("SHA-512");
-        recvcert = (X509Certificate)ks.getCertificate("testrecv");
+        String publicKeyAlias = RECEIVER_ALIAS; // Update with the alias of the user who's public key you want to see
+        String privateKeyAlias = SENDER_ALIAS; // Update with the alias of the user who's private key you want to see
+        String privateKeyPassword = SENDER_PASSWORD; // Update with the password of the user who's private key you want to see
+
+        // Creating an X509 Certificate
+        X509Certificate cert;
+        cert = (X509Certificate)ks.getCertificate(publicKeyAlias);
         
-        // Getting the Receivers public Key from the Certificate
-        PublicKey pubKeyReceiver = recvcert.getPublicKey();
+        // Getting public Key from the Certificate
+        PublicKey pubKeyReceiver = cert.getPublicKey();
         
-        // Getting the local sender's private key from the Certificate
-        char[] keypassword = "send123".toCharArray();
-        Key myKey =  ks.getKey("testsender", keypassword);
+        // Getting private key from the Certificate
+        char[] keypassword = privateKeyPassword.toCharArray(); 
+        Key myKey =  ks.getKey(privateKeyAlias, keypassword);
         PrivateKey myPrivateKey = (PrivateKey)myKey;
 
         // Print them
         BASE64Encoder encoder = new BASE64Encoder();
-        System.out.println("Reveicer private key: "+encoder.encode(pubKeyReceiver.getEncoded()));
+        System.out.println("Public key: "+encoder.encode(pubKeyReceiver.getEncoded()));
         System.out.println("Sender private key: "+encoder.encode(myPrivateKey.getEncoded()));
-    */   
+        */
+    
     }
         
     public static boolean decryptFile(byte[] encryptedFile, byte[] encryptedSymmetricKey, byte[] signedHash) throws FileNotFoundException, IOException, CertificateException {
     try {
-        ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        KEYSTORE = KeyStore.getInstance(KeyStore.getDefaultType());
 
         // Specify the Keystore where the Receivers certificate has been imported
-        char [] password = "testpwd".toCharArray();
-        try (java.io.FileInputStream fis = new java.io.FileInputStream(System.getProperty("user.home")+"/testkeystore.ks")) {
-            ks.load(fis, password);
+        char [] password = KEYSTORE_PASSWORD.toCharArray();
+        try (java.io.FileInputStream fis = new java.io.FileInputStream(KEYSTORE_LOCATION)) {
+            KEYSTORE.load(fis, password);
         }
         
         // 6. Decrypt the encrypted symmetric key using Receiver's private Key
         // 6.1 Get the private key of the Reveiver from the keystore by providing the password set for the private key while creating the keys using keytool
-        char[] recvpassword = "recv123".toCharArray();
-        Key recvKey =  ks.getKey("testrecv", recvpassword);
+        char[] recvpassword = RECEIVER_PASSWORD.toCharArray();
+        Key recvKey =  KEYSTORE.getKey(RECEIVER_ALIAS, recvpassword);
         PrivateKey recvPrivateKey = (PrivateKey)recvKey;
 
         // 6.2 Decrypt to get the symmetric key
         byte[] byteDecryptWithPrivateKey = encryptUtil.decryptData(encryptedSymmetricKey,recvPrivateKey,"RSA/ECB/OAEPWithSHA1AndMGF1Padding");
         
         // 7. Decrypt the data using the Symmetric Key
-        javax.crypto.spec.SecretKeySpec secretKeySpecDecrypted = new javax.crypto.spec.SecretKeySpec(byteDecryptWithPrivateKey,"AES");
-        byte[] byteDecryptText = encryptUtil.decryptData(encryptedFile,secretKeySpecDecrypted,"AES");
+        javax.crypto.spec.SecretKeySpec secretKeySpecDecrypted = new javax.crypto.spec.SecretKeySpec(byteDecryptWithPrivateKey,ENCRYPTION_STANDARD);
+        byte[] byteDecryptText = encryptUtil.decryptData(encryptedFile,secretKeySpecDecrypted,ENCRYPTION_STANDARD);
         String strDecryptedText = new String(byteDecryptText);
         System.out.println(" Decrypted data is: " +strDecryptedText);
 
         // 8. Create a hash of the data that was decrypted
-        MessageDigest md = MessageDigest.getInstance("SHA-512");
+        MessageDigest md = MessageDigest.getInstance(ALGORITHM);
         md.update(byteDecryptText);
         byte byteMDofDecryptedText[] = md.digest();
 
@@ -206,7 +227,7 @@ public class PublicKeyCryptography {
         // 9 Verify the Signature using the Senders public Key
         // 9.1 Extract the Senders public Key from his certificate
         X509Certificate sendercert;
-        sendercert = (X509Certificate)ks.getCertificate("testsender");
+        sendercert = (X509Certificate)KEYSTORE.getCertificate(SENDER_ALIAS);
         PublicKey pubKeySender = sendercert.getPublicKey();
         
         // 9.2 Verifying the Signature
