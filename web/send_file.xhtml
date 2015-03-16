@@ -18,17 +18,16 @@
                         
                         <h:outputText value="Upload a file:" />
                         <h:inputFile id="file" value="#{sendFileBean.file}" validator="#{sendFileBean.validateFile}"/>
-                        
-                        <h:outputText value="Your private key:" />
-                        <h:inputTextarea id="senderPrivateKey" value="#{sendFileBean.senderPrivateKey}"/>
-                                                
+                        <h:outputText value="Enter the email address that will receive encrypted data:" />
+                        <h:inputText id="receiverEmail" value="#{sendFileBean.receiverEmail}" validator="emailValidator"/>
+                        <h:message id="userMsg" style="color: red" for="receiverEmail" />
                         <h:outputText value="Receiver's public key:" />
                         <h:inputTextarea id="receiverPublicKey" value="#{sendFileBean.receiverPublicKey}"/>
                         <h:link value="Browse public keys" outcome="/browse_public_keys" target="_blank"/>
                     </h:panelGrid>
                     <h:commandButton value="Send" type="command"  actionListener="#{sendFileBean.send}">
-                        <f:ajax execute="file senderPrivateKey receiverPublicKey"
-                                render="status"/>
+                        <f:ajax execute="file receiverEmail receiverPublicKey"
+                                render="userMsg status"/>
                     </h:commandButton>
                     <div>
                         <hr/>

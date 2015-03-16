@@ -5,8 +5,28 @@
  */
 package beans;
 
+import crypto.PublicKeyCryptography;
+import static crypto.PublicKeyCryptography.decryptFile;
 import facades.UserAccountFacade;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.UnrecoverableEntryException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
@@ -14,6 +34,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 import models.UserAccount;
+import sun.misc.BASE64Decoder;
 
 /**
  *
@@ -28,7 +49,7 @@ public class SendFileBean extends BaseBean {
 
     private Part file;
     private UserAccount user;
-    private String senderPrivateKey;
+    private String receiverEmail;
     private String receiverPublicKey;
     private String status;
 
@@ -46,14 +67,6 @@ public class SendFileBean extends BaseBean {
         this.userAccountFacade = userAccountFacade;
     }
 
-    public String getSenderPrivateKey() {
-        return senderPrivateKey;
-    }
-
-    public void setSenderPrivateKey(String senderPrivateKey) {
-        this.senderPrivateKey = senderPrivateKey;
-    }
-
     public String getReceiverPublicKey() {
         return receiverPublicKey;
     }
@@ -63,11 +76,20 @@ public class SendFileBean extends BaseBean {
     }
     
     public UserAccount getUser() {
+        this.user = sessionBean.getUser();
         return sessionBean.getUser();
     }
 
     public void setUser(UserAccount user) {
         this.user = user;
+    }
+
+    public String getReceiverEmail() {
+        return receiverEmail;
+    }
+
+    public void setReceiverEmail(String receiverEmail) {
+        this.receiverEmail = receiverEmail;
     }
     
     public String getStatus() {
@@ -101,14 +123,45 @@ public class SendFileBean extends BaseBean {
     
     public void send() {        
         if (getUser() != null) {
-            String fileContent = "";
             try {
-              fileContent = new Scanner(file.getInputStream()).useDelimiter("\\A").next();
-              status = fileContent;
-            } catch (Exception e) {
+                if (file != null) {
+                    String fileContent = new Scanner(file.getInputStream()).useDelimiter("\\A").next();
+                    if (receiverEmail != null && !"".equals(receiverEmail)) {
+                        if (receiverPublicKey != null && !"".equals(receiverPublicKey)) {
+                            // Open the keystore
+                            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+                            char [] password = "testpwd".toCharArray();
+                            try (java.io.FileInputStream fis = new java.io.FileInputStream(System.getProperty("user.dir")+"/testkeystore.ks")) {
+                                ks.load(fis, password);
+                            }
+                            // Get local user's private key
+                            char[] keypassword = "send123".toCharArray();
+                            Key myKey =  ks.getKey("testsender", keypassword);
+                            PrivateKey myPrivateKey = (PrivateKey)myKey;
+
+                            // Parse the public key entered by the user in the interface
+                            BASE64Decoder decoder = new BASE64Decoder();
+                            KeyFactory kf = KeyFactory.getInstance("RSA");
+                            X509EncodedKeySpec pub = new X509EncodedKeySpec(decoder.decodeBuffer(receiverPublicKey));
+                            PublicKey pubKeyReceiver = kf.generatePublic(pub);
+
+                            // Try to send the file to the email entered
+                            boolean success = PublicKeyCryptography.sendFile(getUser(), receiverEmail, fileContent, myPrivateKey, pubKeyReceiver);
+                            if (success) {
+                                status = "File sent successfully.";
+                            }
+                        } else {
+                            status = "No public key was entered.";
+                        }
+                    } else {
+                        status = "No email was entered.";
+                    }
+                } else {
+                    status = "No file was provided.";
+                }
+            } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException | KeyStoreException | CertificateException | UnrecoverableEntryException e) {
               status = "Error Uploading file: " + e.toString();
             }
-            status = fileContent + " was successfully sent from " + senderPrivateKey + " to " + receiverPublicKey;
         } else {
             status = "You are not logged in.";
         }

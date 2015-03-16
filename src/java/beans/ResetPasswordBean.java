@@ -80,13 +80,11 @@ public class ResetPasswordBean extends BaseBean {
                 }
                 if(passwordChanged) {
                     // Email the user with the new password
-                    try {
-                        MailHelper.sendEmail(user, newPassword);
-                        setStatus("Your new password has been emailed to " + user.getUsername() + ".");
-                    } catch (RuntimeException e) {
-                        setStatus("An error occured while sending your new password to " + user.getUsername() + ".");
-                        Logger.getLogger(MailHelper.class.getName()).log(Level.SEVERE, e.toString());
-                    }
+                        if (MailHelper.sendEmail(user, user.getUsername(), "CSI4139 password reset", newPassword, null)) {
+                            setStatus("Your new password has been emailed to " + user.getUsername() + ".");
+                        } else {
+                            setStatus("An error occured while sending your new password to " + user.getUsername() + ".");
+                        }
                 } else {
                     setStatus("An error occured. Please try again.");
                 }

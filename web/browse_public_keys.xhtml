@@ -16,10 +16,10 @@
                     <th>User</th>
                     <th>Public Key</th>
                 </tr>
-                <ui:repeat var="u" value="#{browseKeysBean.userList}" varStatus="status">
+                <ui:repeat var="u" value="#{browseKeysBean.userList}">
                     <tr>
                         <td>#{u.username}</td>
-                        <td>#{u.publicKey}</td>
+                        <td><h:outputText value="#{u.publicKey}" style="white-space: pre-wrap" /></td>
                     </tr>
                 </ui:repeat>
             </table>

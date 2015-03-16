@@ -82,7 +82,7 @@ public class SymmetricEncrypt {
 			if(Algorithm.equals("AES")){
 				aesCipher.init(Cipher.ENCRYPT_MODE,secretKey,aesCipher.getParameters());
 				}
-				else if(Algorithm.equals("RSA/ECB/PKCS1Padding")){
+				else if(Algorithm.equals("RSA/ECB/OAEPWithSHA1AndMGF1Padding")){
 				aesCipher.init(Cipher.ENCRYPT_MODE,secretKey);
 				} 
 				
@@ -143,7 +143,7 @@ public class SymmetricEncrypt {
 		if(Algorithm.equals("AES")){
 		aesCipher.init(Cipher.DECRYPT_MODE,secretKey,aesCipher.getParameters());
 		}
-		else if(Algorithm.equals("RSA/ECB/PKCS1Padding")){
+		else if(Algorithm.equals("RSA/ECB/OAEPWithSHA1AndMGF1Padding")){
 		aesCipher.init(Cipher.DECRYPT_MODE,secretKey);
 		} 
 		
@@ -186,48 +186,5 @@ public class SymmetricEncrypt {
 	
 		return byteDecryptedText;
 		}
-		
-		
-		public static byte[] convertStringToByteArray(String strInput) {
-			strInput = strInput.toLowerCase();
-			byte[] byteConverted = new byte[(strInput.length() + 1) / 2];
-			int j = 0;
-			int interimVal;
-			int nibble = -1;
-
-			for (int i = 0; i < strInput.length(); ++i) {
-				interimVal = strHexVal.indexOf(strInput.charAt(i));
-				if (interimVal >= 0) {
-					if (nibble < 0) {
-						nibble = interimVal;
-					} else {
-						byteConverted[j++] = (byte) ((nibble << 4) + interimVal);
-						nibble = -1;
-					}
-				}
-			}
-
-			if (nibble >= 0) {
-				byteConverted[j++] = (byte) (nibble << 4);
-			}
-
-			if (j < byteConverted.length) {
-				byte[] byteTemp = new byte[j];
-				System.arraycopy(byteConverted, 0, byteTemp, 0, j);
-				byteConverted = byteTemp;
-			}
-
-			return byteConverted;
-		}
-		
-		public static String convertByteArrayToString(byte[] block) {
-			StringBuffer buf = new StringBuffer();
-
-			for (int i = 0; i < block.length; ++i) {
-				buf.append(strHexVal.charAt((block[i] >>> 4) & 0xf));
-				buf.append(strHexVal.charAt(block[i] & 0xf));
-			}
-
-			return buf.toString();
-		}
+                
 }

@@ -1,6 +1,12 @@
 package beans;
 
 import facades.UserAccountFacade;
+import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -9,6 +15,8 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 import models.UserAccount;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 /**
  *
@@ -34,6 +42,7 @@ public class UploadBean extends BaseBean {
     }
 
     public UserAccount getUser() {
+        this.user = sessionBean.getUser();
         return sessionBean.getUser();
     }
 
@@ -57,10 +66,18 @@ public class UploadBean extends BaseBean {
         if (getUser() != null) {
             try {
               String fileContent = new Scanner(publicKey.getInputStream()).useDelimiter("\\A").next();
-              userAccountFacade.setPublicKey(user.getId(), fileContent);
+              BASE64Decoder decoder = new BASE64Decoder();
+              KeyFactory kf = KeyFactory.getInstance("RSA");
+              X509EncodedKeySpec pub = new X509EncodedKeySpec(decoder.decodeBuffer(fileContent));
+              PublicKey pubKeyReceiver = kf.generatePublic(pub);
+              BASE64Encoder encoder = new BASE64Encoder();
+              userAccountFacade.setPublicKey(getUser().getId(), encoder.encode(pubKeyReceiver.getEncoded()));
               status = "File sucessfully uploaded.";
-            } catch (Exception e) {
+            } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
               status = "Error Uploading file: " + e.toString();
+              if (e.getClass().equals(InvalidKeySpecException.class)) {
+                  status = "Error Uploading file: The key you are trying to upload is invalid.";
+              }
             }
         } else {
             status = "You are not logged in.";

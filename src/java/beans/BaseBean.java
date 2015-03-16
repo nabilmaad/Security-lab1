@@ -31,4 +31,7 @@ public abstract class BaseBean {
         this.sessionBean = sessionBean;
     }
     
+    public EntityManager getEntityManager() {
+        return em;
+    }
 }

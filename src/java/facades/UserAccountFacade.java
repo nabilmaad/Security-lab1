@@ -168,8 +168,8 @@ public class UserAccountFacade extends BaseFacade {
         query.setParameter("username", username);
         UserAccount result = performQuery(UserAccount.class, query);
         return result;
-    }      
-        
+    }
+    
     public boolean setPublicKey(Long userId, String publicKey){
         try {
             utx.begin();
