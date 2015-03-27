@@ -13,10 +13,12 @@
             <h1><h:outputText value="#{uploadBean.user.username}"/></h1>
             <h:form enctype="multipart/form-data">
                 <ul>
-                    <li><h:link value="Upload your Public Key" outcome="/upload" /></li>
-                    <li><h:link value="Browse Public Keys" outcome="/browse_public_keys" /></li>
-                    <li><h:link value="Send a Secure File" outcome="/send_file" /></li>
-                    <li><h:link value="Decrypt a Secure File" outcome="/decrypt_file" /></li>
+                    <li><h:outputLabel>Upload your public key: </h:outputLabel></li>
+                    
+                    <h:inputFile id="publicKey" value="#{uploadBean.publicKey}" validator="#{uploadBean.validatePublicKey}"/><br/>
+                    <h:commandButton value="Upload" action="#{uploadBean.upload}">
+                        <f:ajax execute="publicKey" render="status"/>
+                    </h:commandButton>
                 </ul>
             </h:form>
 

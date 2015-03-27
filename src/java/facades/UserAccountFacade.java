@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -167,6 +168,30 @@ public class UserAccountFacade extends BaseFacade {
         query.setParameter("username", username);
         UserAccount result = performQuery(UserAccount.class, query);
         return result;
-    }      
+    }
     
+    public boolean setPublicKey(Long userId, String publicKey){
+        try {
+            utx.begin();
+            String queryString = "SELECT ua FROM UserAccount ua WHERE ua.id = :id";
+            Query query = em.createQuery(queryString);
+            query.setParameter("id", userId);
+            UserAccount user = performQuery(UserAccount.class, query);
+            
+            user.setPublicKey(publicKey);
+            em.persist(user);
+            utx.commit();
+            return true;
+        } catch (Exception e) {
+            Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, e);
+            return false;
+        }
+    }
+    
+    public List<UserAccount> getAllUsers() {
+        Query query = em.createQuery("SELECT ua FROM UserAccount ua");
+        List<UserAccount> result = performQueryList(UserAccount.class, query);
+        return result;
+    }      
+
 }

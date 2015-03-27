@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
+import javax.persistence.Column;
 import javax.persistence.Table;
 
 @Entity
@@ -25,7 +26,8 @@ public class UserAccount {
     @Lob
     private byte[] salt; // the salt used for this account
     @Lob
-    private HashMap<byte[], byte[]> oldPasswords; // set of passwords used by this account 
+    private HashMap<byte[], byte[]> oldPasswords; // set of passwords used by this account
+    private String publicKey;
     
     private int failedLoginAttempts = 0;
 
@@ -71,6 +73,14 @@ public class UserAccount {
 
     public void setSalt(byte[] salt) {
         this.salt = salt;
+    }
+    
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 
     public Long getId() {
