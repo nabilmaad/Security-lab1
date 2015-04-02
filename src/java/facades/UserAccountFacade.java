@@ -188,10 +188,54 @@ public class UserAccountFacade extends BaseFacade {
         }
     }
     
+    public boolean setUserName(Long userId, String name){
+        try {
+            utx.begin();
+            String queryString = "SELECT ua FROM UserAccount ua WHERE ua.id = :id";
+            Query query = em.createQuery(queryString);
+            query.setParameter("id", userId);
+            UserAccount user = performQuery(UserAccount.class, query);
+            
+            user.setName(name);
+            em.persist(user);
+            utx.commit();
+            return true;
+        } catch (Exception e) {
+            Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, e);
+            return false;
+        }
+    }
+    
+    public boolean setUserAge(Long userId, String age){
+        try {
+            utx.begin();
+            String queryString = "SELECT ua FROM UserAccount ua WHERE ua.id = :id";
+            Query query = em.createQuery(queryString);
+            query.setParameter("id", userId);
+            UserAccount user = performQuery(UserAccount.class, query);
+            
+            if (isValidAge(age)) {
+                user.setAge(age);
+            } else {
+                throw new IllegalArgumentException("Age must be a positive digit.");
+            }
+            em.persist(user);
+            utx.commit();
+            return true;
+        } catch (Exception e) {
+            Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, e);
+            return false;
+        }
+    }
+    
     public List<UserAccount> getAllUsers() {
         Query query = em.createQuery("SELECT ua FROM UserAccount ua");
         List<UserAccount> result = performQueryList(UserAccount.class, query);
         return result;
     }      
+    
+    public boolean isValidAge(String age) {
+        return age.matches("[1-9]+");
+    }
 
 }

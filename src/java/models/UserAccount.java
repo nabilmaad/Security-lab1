@@ -21,6 +21,8 @@ public class UserAccount {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String username;
+    private String name;
+    private String age;
     @Lob
     private byte[] password; // salted + hashed password
     @Lob
@@ -58,7 +60,23 @@ public class UserAccount {
     public void setUsername(String username) {
         this.username = username;
     }
+    
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+        
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+    
     public byte[] getPassword() {
         return password;
     }
