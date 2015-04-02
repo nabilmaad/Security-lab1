@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="./template.xhtml">
+
+        <ui:define name="content">
+            <h1><h:outputText value="#{uploadBean.user.username}"/></h1>
+            <ul>
+                <ui:repeat var="u" value="#{allowedBean.allowedUsers}">
+                <li>
+                <td><h:outputText value="#{u.username}" style="white-space: pre-wrap" /></td>
+                </li>
+                </ui:repeat>
+                <h:form>
+                    <li><h:outputLabel>People allowed to see your public key: </h:outputLabel></li>
+                    <h:selectManyCheckbox id="allowedUsers" value="#{allowedBean.allowedUsers}">
+                        <f:selectItems value="#{allowedBean.userList}" var="n"
+                        itemLabel="#{n.username}" itemValue="#{n.username}" />
+                    </h:selectManyCheckbox>
+                    <h:commandButton value="Submit" action="#{allowedBean.submit}">
+                            <f:ajax execute="allowedUsers" render="status"/>
+                    </h:commandButton>
+                </h:form>
+            </ul>
+            
+            <hr/>
+            
+            <div>
+                <h:outputText style="color:royalblue; font-size: large; font-weight: bold" id="status" value="#{allowedBean.status}"/>
+            </div>
+        </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

@@ -19,6 +19,7 @@
                     <h:commandButton value="Upload" action="#{uploadBean.upload}">
                         <f:ajax execute="publicKey" render="status"/>
                     </h:commandButton>
+                    <li><h:link value="Choose who can see your public key" outcome="/allowed" /></li>
                 </ul>
             </h:form>
 

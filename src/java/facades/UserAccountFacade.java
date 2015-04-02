@@ -232,7 +232,12 @@ public class UserAccountFacade extends BaseFacade {
         Query query = em.createQuery("SELECT ua FROM UserAccount ua");
         List<UserAccount> result = performQueryList(UserAccount.class, query);
         return result;
-    }      
+    }
+    
+    public List<UserAccount> removeUserFromList(List<UserAccount> list, String user) {
+        list.remove(findByUsername(user, em));
+        return list;
+    }
     
     public boolean isValidAge(Integer age) {
         return age>0;
