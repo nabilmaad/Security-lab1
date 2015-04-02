@@ -1,23 +1,13 @@
 package beans;
 
 import facades.UserAccountFacade;
-import java.io.IOException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.Part;
 import models.UserAccount;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -46,6 +36,8 @@ public class AllowedBean extends BaseBean {
         try {
             context.redirect(context.getRequestContextPath() + "/login.xhtml");
         } catch (Exception e) {}
+        } else {
+            allowedUsers = userAccountFacade.getAllowedUsers();
         }
     }
     
@@ -85,10 +77,8 @@ public class AllowedBean extends BaseBean {
     
     public void submit() {        
         if (getUser() != null) {
-            status = "Users: ";
-            for(String u : allowedUsers) {
-                status += u + " ";
-            }
+            userAccountFacade.setAllowedUsers(getUser().getId(), allowedUsers);
+            status = "Sucessfully updated list of allowed users.";
         } else {
             status = "You are not logged in.";
         }

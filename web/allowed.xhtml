@@ -12,11 +12,6 @@
         <ui:define name="content">
             <h1><h:outputText value="#{uploadBean.user.username}"/></h1>
             <ul>
-                <ui:repeat var="u" value="#{allowedBean.allowedUsers}">
-                <li>
-                <td><h:outputText value="#{u.username}" style="white-space: pre-wrap" /></td>
-                </li>
-                </ui:repeat>
                 <h:form>
                     <li><h:outputLabel>People allowed to see your public key: </h:outputLabel></li>
                     <h:selectManyCheckbox id="allowedUsers" value="#{allowedBean.allowedUsers}">

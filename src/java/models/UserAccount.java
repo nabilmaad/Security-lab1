@@ -1,6 +1,8 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,6 +27,7 @@ public class UserAccount {
     private byte[] salt; // the salt used for this account
     @Lob
     private HashMap<byte[], byte[]> oldPasswords; // set of passwords used by this account
+    private List<String> allowedUsers;
     private String publicKey;
     
     private int failedLoginAttempts = 0;
@@ -39,6 +42,7 @@ public class UserAccount {
 
     public UserAccount() {
         oldPasswords = new HashMap<>();
+        allowedUsers = new ArrayList<String>();
     }
     
     public HashMap<byte[], byte[]> getOldPasswords() {
@@ -47,6 +51,15 @@ public class UserAccount {
 
     public void setOldPasswords(HashMap<byte[], byte[]> oldPasswords) {
         this.oldPasswords = oldPasswords;
+    }
+    
+        
+    public List<String> getAllowedUsers() {
+        return allowedUsers;
+    }
+
+    public void setAllowedUsers(List<String> allowedUsers) {
+        this.allowedUsers = allowedUsers;
     }
     
     public String getUsername() {

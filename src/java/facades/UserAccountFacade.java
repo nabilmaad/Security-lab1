@@ -228,6 +228,29 @@ public class UserAccountFacade extends BaseFacade {
         }
     }
     
+    public boolean setAllowedUsers(Long userId, List<String> allowedUsers) {
+        try {
+            utx.begin();
+            String queryString = "SELECT ua FROM UserAccount ua WHERE ua.id = :id";
+            Query query = em.createQuery(queryString);
+            query.setParameter("id", userId);
+            UserAccount user = performQuery(UserAccount.class, query);
+            user.setAllowedUsers(allowedUsers);
+            em.persist(user);
+            utx.commit();
+            return true;
+        } catch (Exception e) {
+            Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, e);
+            return false;
+        }
+    }
+    
+    public List<String> getAllowedUsers(){
+        Query query = em.createQuery("SELECT ua.allowedUsers FROM UserAccount ua");
+        List result = performQuery(List.class, query);
+        return result;
+    }
+    
     public List<UserAccount> getAllUsers() {
         Query query = em.createQuery("SELECT ua FROM UserAccount ua");
         List<UserAccount> result = performQueryList(UserAccount.class, query);
