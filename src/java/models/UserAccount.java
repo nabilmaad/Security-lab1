@@ -1,15 +1,11 @@
 package models;
 
-import java.util.Date;
 import java.util.HashMap;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.OneToOne;
-import javax.persistence.Column;
 import javax.persistence.Table;
 
 @Entity
@@ -22,7 +18,7 @@ public class UserAccount {
     private Long id;
     private String username;
     private String name;
-    private String age;
+    private Integer age;
     @Lob
     private byte[] password; // salted + hashed password
     @Lob
@@ -69,11 +65,11 @@ public class UserAccount {
         this.name = name;
     }
         
-    public String getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(String age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
     

@@ -206,7 +206,7 @@ public class UserAccountFacade extends BaseFacade {
         }
     }
     
-    public boolean setUserAge(Long userId, String age){
+    public boolean setUserAge(Long userId, Integer age){
         try {
             utx.begin();
             String queryString = "SELECT ua FROM UserAccount ua WHERE ua.id = :id";
@@ -234,8 +234,8 @@ public class UserAccountFacade extends BaseFacade {
         return result;
     }      
     
-    public boolean isValidAge(String age) {
-        return age.matches("[1-9]+");
+    public boolean isValidAge(Integer age) {
+        return age>0;
     }
 
 }
