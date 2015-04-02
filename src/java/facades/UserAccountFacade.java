@@ -245,8 +245,9 @@ public class UserAccountFacade extends BaseFacade {
         }
     }
     
-    public List<String> getAllowedUsers(){
-        Query query = em.createQuery("SELECT ua.allowedUsers FROM UserAccount ua");
+    public List<String> getAllowedUsers(Long userId){
+        Query query = em.createQuery("SELECT ua.allowedUsers FROM UserAccount ua WHERE ua.id = :id");
+        query.setParameter("id", userId);
         List result = performQuery(List.class, query);
         return result;
     }

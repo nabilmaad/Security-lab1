@@ -37,7 +37,7 @@ public class AllowedBean extends BaseBean {
             context.redirect(context.getRequestContextPath() + "/login.xhtml");
         } catch (Exception e) {}
         } else {
-            allowedUsers = userAccountFacade.getAllowedUsers();
+            allowedUsers = userAccountFacade.getAllowedUsers(getUser().getId());
         }
     }
     

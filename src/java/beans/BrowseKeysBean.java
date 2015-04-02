@@ -18,6 +18,7 @@ public class BrowseKeysBean extends BaseBean {
     @ManagedProperty(value="#{userAccountFacade}")
     UserAccountFacade userAccountFacade;
 
+    private UserAccount user;
     private List<UserAccount> userList;
     private String status;
     
@@ -40,18 +41,34 @@ public class BrowseKeysBean extends BaseBean {
         this.userAccountFacade = userAccountFacade;
     }
 
+    public UserAccount getUser() {
+        this.user = sessionBean.getUser();
+        return sessionBean.getUser();
+    }
+
+    public void setUser(UserAccount user) {
+        this.user = user;
+    }
+    
     public List<UserAccount> getUserList() {
-        userList = userAccountFacade.getAllUsers();
-        if (userList == null) {
+        List<UserAccount> all = userAccountFacade.getAllUsers();
+        userList = new ArrayList<>();
+        for (UserAccount u : all) {
+            List<String> allowedList = u.getAllowedUsers();
+            if (allowedList.contains(getUser().getUsername())) {
+                userList.add(u);
+            }
+        }
+        if (userList.isEmpty()) {
             UserAccount user = new UserAccount();
-            user.setUsername("No users");
-            user.setPublicKey("No public keys");
+            user.setUsername("No user allowed you to see their public key.");
+            user.setPublicKey("N/A");
             userList = new ArrayList<UserAccount>();
             userList.add(user);
         }
-        for (UserAccount user : userList) {
-            if (user.getPublicKey() == null) {
-                user.setPublicKey("No public key");
+        for (UserAccount u : userList) {
+            if (u.getPublicKey() == null) {
+                u.setPublicKey("No public key");
             }
         }
         return userList;
