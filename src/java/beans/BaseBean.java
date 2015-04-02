@@ -5,6 +5,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.UserTransaction;
+import models.UserAccount;
 
 public abstract class BaseBean {
 
@@ -33,5 +34,14 @@ public abstract class BaseBean {
     
     public EntityManager getEntityManager() {
         return em;
+    }
+    
+    public boolean isLoggedIn() {
+        if (sessionBean != null) {
+            if (sessionBean.getUser() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 }

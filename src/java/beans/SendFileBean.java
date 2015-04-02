@@ -6,9 +6,7 @@
 package beans;
 
 import crypto.PublicKeyCryptography;
-import static crypto.PublicKeyCryptography.decryptFile;
 import facades.UserAccountFacade;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -18,19 +16,16 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableEntryException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 import javax.faces.component.UIComponent;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 import models.UserAccount;
@@ -53,10 +48,15 @@ public class SendFileBean extends BaseBean {
     private String receiverPublicKey;
     private String status;
 
-    /**
-     * Creates a new instance of CreateAccountBean
-     */
-    public SendFileBean() {
+    @PostConstruct
+    public void init() {
+        if(!isLoggedIn()) {
+            ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+            context.invalidateSession();
+        try {
+            context.redirect(context.getRequestContextPath() + "/login.xhtml");
+        } catch (Exception e) {}
+        }
     }
 
     public UserAccountFacade getUserAccountFacade() {

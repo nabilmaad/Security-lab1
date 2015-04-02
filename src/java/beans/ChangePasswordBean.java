@@ -2,9 +2,12 @@ package beans;
 
 import exeptions.PasswordAlreadyUsedException;
 import facades.UserAccountFacade;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import models.UserAccount;
 
 @SessionScoped
@@ -20,10 +23,15 @@ public class ChangePasswordBean extends BaseBean {
     private boolean disableChangeButton;
     private String status;
     
-    /**
-     * Creates a new instance of ChangePasswordBean
-     */
-    public ChangePasswordBean() {
+    @PostConstruct
+    public void init() {
+        if(!isLoggedIn()) {
+            ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+            context.invalidateSession();
+        try {
+            context.redirect(context.getRequestContextPath() + "/login.xhtml");
+        } catch (Exception e) {}
+        }
     }
 
     public UserAccountFacade getUserAccountFacade() {

@@ -10,7 +10,7 @@
         <ui:composition template="./template.xhtml">
 
         <ui:define name="content">
-            <h1><h:outputText value="#{uploadBean.user.username}"/></h1>
+            <h1><h:outputText value="#{loginSuccessfulBean.user.username}"/></h1>
             <h:form enctype="multipart/form-data">
                 <ul>
                     <li><h:link value="Upload your Public Key" outcome="/upload" /></li>
@@ -22,7 +22,7 @@
 
             <hr/>
             <div>
-                <h:outputText style="color:royalblue; font-size: large; font-weight: bold" id="status" value="#{uploadBean.status}"/>
+                <h:outputText style="color:royalblue; font-size: large; font-weight: bold" id="status" value="#{loginSuccessfulBean.status}"/>
             </div>
         </ui:define>
             

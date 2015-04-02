@@ -8,10 +8,12 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 import models.UserAccount;
@@ -32,6 +34,17 @@ public class UploadBean extends BaseBean {
     private Part publicKey;
     private UserAccount user;
     private String status;
+    
+    @PostConstruct
+    public void init() {
+        if(!isLoggedIn()) {
+            ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+            context.invalidateSession();
+        try {
+            context.redirect(context.getRequestContextPath() + "/login.xhtml");
+        } catch (Exception e) {}
+        }
+    }
     
     public UserAccountFacade getUserAccountFacade() {
         return userAccountFacade;

@@ -8,11 +8,12 @@ package beans;
 import crypto.PublicKeyCryptography;
 import facades.UserAccountFacade;
 import java.io.IOException;
-import java.util.Scanner;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 import javax.faces.component.UIComponent;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 import models.UserAccount;
@@ -34,10 +35,15 @@ public class DecryptFileBean extends BaseBean {
     private Part signedHash;
     private String status;
 
-    /**
-     * Creates a new instance of CreateAccountBean
-     */
-    public DecryptFileBean() {
+    @PostConstruct
+    public void init() {
+        if(!isLoggedIn()) {
+            ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+            context.invalidateSession();
+        try {
+            context.redirect(context.getRequestContextPath() + "/login.xhtml");
+        } catch (Exception e) {}
+        }
     }
 
     public UserAccountFacade getUserAccountFacade() {
