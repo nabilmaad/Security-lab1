@@ -1,10 +1,13 @@
 package beans;
 
 import facades.UserAccountFacade;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import models.UserAccount;
@@ -17,7 +20,7 @@ public class SettingsBean extends BaseBean {
     UserAccountFacade userAccountFacade;
 
     private String name;
-    private Integer age;
+    private String age;
     private String status;
 
     @PostConstruct
@@ -32,7 +35,7 @@ public class SettingsBean extends BaseBean {
             UserAccount user = sessionBean.getUser();
             if(user != null) {
                 setName(user.getName());
-                setAge(user.getAge());
+                setAge(user.getAge().toString());
             } else {
                 status = "You are not logged in.";
             }
@@ -55,11 +58,11 @@ public class SettingsBean extends BaseBean {
         this.name = name;
     }
 
-    public Integer getAge() {
+    public String getAge() {
         return age;
     }
 
-    public void setAge(Integer age) {
+    public void setAge(String age) {
         this.age = age;
     }
 
@@ -91,16 +94,28 @@ public class SettingsBean extends BaseBean {
         UserAccount user = sessionBean.getUser();
         
         if (user != null) {
-            if(userAccountFacade.isValidAge(age)) {
-                user.setAge(age);
-                userAccountFacade.setUserAge(user.getId(), age);
-                status = "Age successfully updated.";
-            } else {
-                status = "Please enter a valid age.";
+            if(isInteger(age)) {
+                if(userAccountFacade.isValidAge(Integer.parseInt(age))) {
+                    user.setAge(Integer.parseInt(age));
+                    userAccountFacade.setUserAge(user.getId(), Integer.parseInt(age));
+                    status = "Age successfully updated.";
+                } else {
+                    status = "Age must be an integer superior to zero.";
+                }
             }
         } else {
             status = "You are not logged in.";
         }
+    }
+    
+    public boolean isInteger(String age) {
+        try {
+            Integer.parseInt(age);
+        } catch (NumberFormatException e) {
+            status = "Age must be an integer superior to zero.";
+            return false;
+        }
+        return true;
     }
 
 }
